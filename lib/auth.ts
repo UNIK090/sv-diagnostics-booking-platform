@@ -6,7 +6,7 @@ import { getSetting, verifyAdmin } from '@/lib/store'
  *
  * Credentials live in the database and are editable from the console
  * (Settings -> Security). On first run the store initialises them from
- * ADMIN_PASSWORD, or the documented default for local use.
+ * ADMIN_ID / ADMIN_PASSWORD, or the documented default for local use.
  */
 
 export const SESSION_COOKIE = 'sv_admin_session'
