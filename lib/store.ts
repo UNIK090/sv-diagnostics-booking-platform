@@ -200,10 +200,31 @@ export function isAdminConfigured() {
   return Boolean(getSetting('admin_password_hash'))
 }
 
-/** First run: the documented default password, which the console then owns. */
+let appliedEnvFingerprint: string | null = null
+
+/**
+ * First run: ADMIN_ID / ADMIN_PASSWORD (or the documented default), which the
+ * console then owns. Changing those env vars later re-applies them once, so a
+ * deployment can always recover or rotate the admin login.
+ */
 export function ensureDefaultAdmin() {
+  const envId = process.env.ADMIN_ID?.trim()
+  const envPassword = process.env.ADMIN_PASSWORD
+  if (envPassword) {
+    if (appliedEnvFingerprint === null) {
+      appliedEnvFingerprint = scryptSync(`${envId ?? ''}\0${envPassword}`, 'sv-admin-env', 32).toString('hex')
+    }
+    if (getSetting('admin_env_fingerprint') !== appliedEnvFingerprint) {
+      if (envId) setSetting('admin_id', envId)
+      const { salt, hash } = hashPassword(envPassword)
+      setSetting('admin_password_salt', salt)
+      setSetting('admin_password_hash', hash)
+      setSetting('admin_env_fingerprint', appliedEnvFingerprint)
+    }
+    return
+  }
   if (isAdminConfigured()) return
-  const { salt, hash } = hashPassword(process.env.ADMIN_PASSWORD ?? 'sv-admin-2026')
+  const { salt, hash } = hashPassword('sv-admin-2026')
   setSetting('admin_password_salt', salt)
   setSetting('admin_password_hash', hash)
 }

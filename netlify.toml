@@ -1,0 +1,4 @@
+[build]
+  # Dependencies are installed before this runs; avoid relying on a global pnpm binary.
+  command = "npm run build"
+  publish = ".next"
