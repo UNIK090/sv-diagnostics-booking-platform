@@ -1,0 +1,5 @@
+[build]
+  # Dependencies are installed by Netlify's install step (pnpm, from the lockfile).
+  # Run the build script directly so the command works even where pnpm isn't on PATH.
+  command = "npm run build"
+  publish = ".next"
